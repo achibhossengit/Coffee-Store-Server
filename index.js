@@ -15,6 +15,7 @@ app.get("/", (req, res) => {
 });
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.xohmh76.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+console.log(uri);
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -30,6 +31,7 @@ async function run() {
     await client.connect();
 
     const coffeeColection = client.db("coffeeDB").collection("coffees");
+    const usersColection = client.db("coffeeDB").collection("users");
 
     app.get("/coffees", async (req, res) => {
       const result = await coffeeColection.find().toArray();
@@ -64,6 +66,40 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await coffeeColection.deleteOne(query);
+      res.send(result);
+    });
+
+    // user related endpoint
+    app.get("/users", async (req, res) => {
+      const result = await usersColection.find().toArray();
+      res.send(result);
+    });
+
+    app.post("/users", async (req, res) => {
+      const newUser = req.body;
+      console.log(newUser);
+      const result = await usersColection.insertOne(newUser);
+      res.send(result);
+    });
+
+    app.patch("/users", async (req, res) => {
+      const { email, lastSignInTime } = req.body;
+      const filter = { email: email };
+      const updateDoc = {
+        $set: {
+          lastSignInTime: lastSignInTime,
+        },
+      };
+
+      const result = await usersColection.updateOne(filter, updateDoc);
+
+      res.send(result);
+    });
+
+    app.delete("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await usersColection.deleteOne(query);
       res.send(result);
     });
 
