@@ -1,7 +1,7 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
-require("dotenv").config();
 
 const app = express();
 const port = process.env.port || 3000;
@@ -28,7 +28,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    await client.connect();
+    // await client.connect();
 
     const coffeeColection = client.db("coffeeDB").collection("coffees");
     const usersColection = client.db("coffeeDB").collection("users");
